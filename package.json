@@ -1,0 +1,11 @@
+{
+  "name": "tv-tracker",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "start-server": "cd server && npm run start"
+  },
+  "keywords": [],
+  "author": "Jordan",
+  "license": "ISC"
+}
