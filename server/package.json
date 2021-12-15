@@ -4,15 +4,24 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "node src/index.js"
+        "start": "nodemon src/index.js"
     },
     "keywords": [],
     "author": "Jordan",
     "license": "ISC",
     "dependencies": {
+        "@phoenix35/express-async-methods": "^0.1.0",
+        "bcrypt": "^5.0.1",
+        "body-parser": "^1.19.1",
         "express": "^4.17.1",
-        "http-proxy": "^1.18.1",
-        "mysql2": "^2.3.3-rc.0"
+        "http-proxy-middleware": "^2.0.1",
+        "jsonwebtoken": "^8.5.1",
+        "knex": "^0.95.14",
+        "mysql2": "^2.3.3"
     },
-    "type": "module"
+    "type": "module",
+    "devDependencies": {
+        "dotenv-safe": "^8.2.0",
+        "nodemon": "^2.0.15"
+    }
 }
