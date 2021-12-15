@@ -11,11 +11,9 @@ const knex = knexFn({
   }
 });
 
-// await knex.raw("DROP DATABASE IF EXISTS tv_tracker"); // For testing
+await knex.raw("DROP DATABASE IF EXISTS tv_tracker");
 await knex.raw("CREATE DATABASE IF NOT EXISTS tv_tracker");
 await knex.raw("USE tv_tracker");
-
-// await knex.schema.dropTableIfExists('users');
 
 const userTableExists = await knex.schema.hasTable('users');
 

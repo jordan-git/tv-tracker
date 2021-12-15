@@ -2,7 +2,7 @@ import express from 'express';
 import { addAsync } from '@phoenix35/express-async-methods';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import dotenv from 'dotenv-safe';
 
 dotenv.config();
@@ -17,7 +17,10 @@ app.use(express.static(join(__dirname, 'public')));
 
 app.use('/api/users', createProxyMiddleware({
   target: `http://localhost:${process.env.USERS_PORT}/`,
+  changeOrigin: true,
   pathRewrite: { '^/api/users': '' },
+  onProxyReq: fixRequestBody,
+  timeout: 10000,
 }));
 
 export default app;
