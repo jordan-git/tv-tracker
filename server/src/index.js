@@ -20,7 +20,7 @@ const directories = (await (fsP.readdir(path.join(__dirname, 'services'), { with
 
 for (const directory of directories) {
   try {
-    await import(pathToFileURL(path.join(__dirname, `services/${directory}/app.js`)));
+    await import(pathToFileURL(path.join(__dirname, `services/${directory}/service.js`)));
   } catch (err) {
     console.log(`Error starting service ${directory}`);
     console.error(err);

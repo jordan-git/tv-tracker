@@ -11,17 +11,22 @@ const knex = knexFn({
   }
 });
 
-await knex.raw("DROP DATABASE IF EXISTS tv_tracker"); // For testing
+// await knex.raw("DROP DATABASE IF EXISTS tv_tracker"); // For testing
 await knex.raw("CREATE DATABASE IF NOT EXISTS tv_tracker");
 await knex.raw("USE tv_tracker");
 
-await knex.schema.dropTableIfExists('users');
-await knex.schema.createTable('users', (table) => {
-  table.increments('id').primary();
-  table.string('name');
-  table.string('email');
-  table.string('password');
-});
+// await knex.schema.dropTableIfExists('users');
+
+const userTableExists = await knex.schema.hasTable('users');
+
+if (!userTableExists) {
+  await knex.schema.createTable('users', (table) => {
+    table.increments('id').primary();
+    table.string('name');
+    table.string('email');
+    table.string('password');
+  });
+}
 
 const users = [
   { name: 'John Doe', email: 'test1@mail.com', password: 'password' },

@@ -2,14 +2,20 @@ import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
 import knex from './database.js'
 
-const verifyToken = util.promisify(jsonwebtoken.verify);
+const validateToken = util.promisify(jsonwebtoken.verify);
 
-export async function verifyJWT(req, res, next) {
+export async function validateJWT(req, res, next) {
   const [, token] = req.headers.authorization.split(' ');
   try {
-    const { id } = await verifyToken(token, process.env.JWT_SECRET);
+    const { id } = await validateToken(token, process.env.JWT_SECRET);
 
-    await knex('users').select("*").where({ id }).first();
+    const user = await knex('users').select("*").where({ id }).first();
+
+    if (!user) {
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
+    console.log(user);
 
     next();
   } catch (err) {
