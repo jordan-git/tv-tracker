@@ -1,16 +1,16 @@
 import { Router } from '@phoenix35/express-async-methods';
 
-import { login, register } from './controllers.js';
-import { validateJWT } from './middleware.js';
+import { verifyCredentials, createUser, getUsers, getUser } from './controllers.js';
+import { validateJWT, createRequiredFieldsMiddleWare } from '../../middleware.js';
 
 const router = Router();
 
-router.postAsync('/login', login);
+router.getAsync('/', getUsers);
 
-router.postAsync('/register', register);
+router.getAsync('/:id', getUser);
 
-router.getAsync('/verify', validateJWT, (req, res) => {
-  res.json({ verified: true });
-});
+router.postAsync('/', createRequiredFieldsMiddleWare(['username', 'email', 'password']), createUser);
+
+router.postAsync('/login', createRequiredFieldsMiddleWare(['email', 'password']), verifyCredentials);
 
 export default router;

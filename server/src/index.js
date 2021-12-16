@@ -14,15 +14,20 @@ const port = Number(process.env.SERVER_PORT);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // start microservices
-const directories = (await (fsP.readdir(path.join(__dirname, 'services'), { withFileTypes: true })))
-  .filter((dir) => dir.isDirectory())
-  .map(({ name }) => name);
+// const directories = (await (fsP.readdir(path.join(__dirname, 'services'), { withFileTypes: true })))
+//   .filter((dir) => dir.isDirectory())
+//   .map(({ name }) => name);
 
-for (const directory of directories) {
+const loadOrder = [
+  'users',
+  'profiles',
+];
+
+for (const service of loadOrder) {
   try {
-    await import(pathToFileURL(path.join(__dirname, `services/${directory}/service.js`)));
+    await import(pathToFileURL(path.join(__dirname, `services/${service}/service.js`)));
   } catch (err) {
-    console.log(`Error starting service ${directory}`);
+    console.log(`Error starting service ${service}`);
     console.error(err);
   }
 }

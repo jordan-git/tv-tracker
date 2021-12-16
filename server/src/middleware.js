@@ -1,6 +1,6 @@
 import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
-import knex from './database.js'
+import knex from './connection.js'
 
 const validateToken = util.promisify(jsonwebtoken.verify);
 
@@ -15,7 +15,6 @@ export async function validateJWT(req, res, next) {
       res.status(401).json({ error: 'Invalid token' });
       return;
     }
-    console.log(user);
 
     next();
   } catch (err) {
@@ -31,5 +30,23 @@ export async function validateJWT(req, res, next) {
         res.status(500).json({ error: 'Internal server error' });
         console.error(`Uncaught JWT error: ${err}`);
     }
+  }
+}
+
+export function createRequiredFieldsMiddleWare(fields) {
+  return (req, res, next) => {
+    const missingFields = fields.reduce(((acc, field) =>
+      !Object.prototype.hasOwnProperty.call(req.body, field) ? [...acc, field] : acc
+    ), []);
+
+    if (missingFields.length) {
+      res.status(400).json({
+        error: `Missing field${missingFields.length === 1 ? '' : 's'}`,
+        fields: missingFields
+      });
+      return;
+    }
+
+    next();
   }
 }

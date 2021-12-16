@@ -9,8 +9,8 @@ app.use(express.json());
 
 app.use(router);
 
-app.listen(parseInt(process.env.USER_PORT), () => {
-  console.log(`User service listening on port ${process.env.USER_PORT}`);
+app.listen(parseInt(process.env.PROFILE_PORT), () => {
+  console.log(`Profile service listening on port ${process.env.PROFILE_PORT}`);
 });
 
 export default app;
