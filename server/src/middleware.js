@@ -4,7 +4,7 @@ import knex from './connection.js'
 
 const validateToken = util.promisify(jsonwebtoken.verify);
 
-export async function validateJWT(req, res, next) {
+export async function verifyJWT(req, res, next) {
   const [, token] = req.headers.authorization.split(' ');
   try {
     const { id } = await validateToken(token, process.env.JWT_SECRET);

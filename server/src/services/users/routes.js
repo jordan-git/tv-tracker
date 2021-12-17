@@ -1,7 +1,7 @@
 import { Router } from '@phoenix35/express-async-methods';
 
 import { verifyCredentials, createUser, getUsers, getUser } from './controllers.js';
-import { validateJWT, createRequiredFieldsMiddleWare } from '../../middleware.js';
+import { verifyJWT, createRequiredFieldsMiddleWare } from '../../middleware.js';
 
 const router = Router();
 

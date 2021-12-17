@@ -8,12 +8,12 @@ dotenv.config();
 let token;
 const baseUrl = `http://localhost:${process.env.SERVER_PORT}`;
 const endpoints = {
-  login: '/api/users/login',
-  register: '/api/users/register',
-  verify: '/api/users/verify',
+  login: '/api/login',
+  register: '/api/register',
+  verify: '/api/verify',
 }
 const dummyData = {
-  name: Math.random().toString(36).slice(2),
+  username: Math.random().toString(36).slice(2),
   email: Math.random().toString(36).slice(2),
   password: Math.random().toString(36).slice(2),
 }
