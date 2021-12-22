@@ -25,7 +25,7 @@ export async function getProfile(req, res) {
 export async function createProfile(req, res) {
   const { user_id } = req.body;
 
-  const user = await sendRequest(`users/${user_id}`, 'GET');
+  const user = await sendRequest(`/users/${user_id}`, 'GET');
 
   if (user.error) {
     res.status(400).json({ error: user.error });

@@ -15,7 +15,7 @@ export async function sendRequest(endpoint, method, payload = null, headers = {}
     options.body = JSON.stringify(payload);
   }
 
-  const response = await fetch(`http://localhost:${process.env.SERVER_PORT}/api/${endpoint}`, options);
+  const response = await fetch(`http://localhost:${process.env.SERVER_PORT}/api${endpoint}`, options);
 
   return response.json();
 }
