@@ -1,12 +1,15 @@
 import knexFn from 'knex';
+import dotenv from 'dotenv-safe';
+
+dotenv.config();
 
 const knex = knexFn({
   client: 'mysql2',
   connection: {
     host: '127.0.0.1',
-    port: 3306,
-    user: 'root',
-    password: 'password'
+    port: parseInt(process.env.DB_PORT),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS
   }
 });
 

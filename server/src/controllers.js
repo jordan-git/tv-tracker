@@ -1,18 +1,24 @@
-import { response } from 'express';
 import fetch from 'node-fetch';
 
+// TODO: Move helper functions to separate file for cross-service communication
 async function sendRequest(endpoint, method, payload) {
-  const response = await fetch(`http://localhost:${process.env.SERVER_PORT}${endpoint}`, {
+  const options = {
     method,
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
-  });
+  };
+
+  if (payload) {
+    options.body = JSON.stringify(payload);
+  }
+
+  const response = await fetch(`http://localhost:${process.env.SERVER_PORT}${endpoint}`, options);
 
   return response.json();
 }
 
+// TODO: Move register/login controllers to user service & handle with sendRequest helper function
 export async function register(req, res) {
   const { username, email, password, gender, birthday } = req.body;
 

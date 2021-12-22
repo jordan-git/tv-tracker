@@ -1,6 +1,7 @@
 import knex from '../../connection.js';
 import bycrypt from 'bcrypt';
 
+// TODO: Consider separate knex objects for each table and solely rely on requests for cross-service communication
 const userTableExists = await knex.schema.hasTable('users');
 
 if (!userTableExists) {

@@ -2,12 +2,12 @@ import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
 import knex from './connection.js'
 
-const validateToken = util.promisify(jsonwebtoken.verify);
+const verifyToken = util.promisify(jsonwebtoken.verify);
 
 export async function verifyJWT(req, res, next) {
   const [, token] = req.headers.authorization.split(' ');
   try {
-    const { id } = await validateToken(token, process.env.JWT_SECRET);
+    const { id } = await verifyToken(token, process.env.JWT_SECRET);
 
     const user = await knex('users').select("*").where({ id }).first();
 
