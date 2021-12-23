@@ -2,8 +2,13 @@ import dotenv from 'dotenv-safe';
 import fetch from 'node-fetch';
 import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+export const logsFolderPath = path.join(__dirname, '../logs');
 
 export async function sendRequest(endpoint, method, payload = null, headers = {}) {
   const options = {

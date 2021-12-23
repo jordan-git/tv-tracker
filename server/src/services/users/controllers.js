@@ -1,9 +1,6 @@
 import bcrypt from 'bcrypt';
-import jsonwebtoken from 'jsonwebtoken';
-import util from 'util';
-
 import knex from './db.js'
-import { sendRequest, signToken } from '../../util.js';
+import { sendRequest, signToken } from '../../utils.js';
 
 export async function login(req, res) {
   const { email, password } = req.body;
@@ -23,7 +20,7 @@ export async function login(req, res) {
 
   // TODO: Make function for JWT signing
   // Sign JWT token
-  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '3m' });
 
   const { refresh } = await sendRequest(`/users/${user.id}/token`, 'POST');
 
@@ -32,7 +29,6 @@ export async function login(req, res) {
 
 export async function getUsers(req, res) {
   const users = await knex('users').select("*");
-
   res.json(users);
 }
 
@@ -159,8 +155,8 @@ export async function createRefreshToken(req, res) {
 
   const refreshToken = generateRefreshToken();
 
-  const hourFromNow = new Date(new Date().getTime() + 1000 * 60 * 60);
-  const [expires] = hourFromNow.toISOString().split('T');
+  const TwoDaysFromNow = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 2);
+  const [expires] = TwoDaysFromNow.toISOString().split('T');
 
   await knex('tokens').insert({
     token: refreshToken,

@@ -1,5 +1,5 @@
 import knex from './db.js';
-import { sendRequest } from '../../util.js';
+import { sendRequest } from '../../utils.js';
 
 // TODO: Add error handling
 

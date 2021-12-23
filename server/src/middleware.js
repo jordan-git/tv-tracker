@@ -1,7 +1,7 @@
 import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
 import knex from './connection.js'
-import { verifyToken } from './util.js';
+import { verifyToken } from './utils.js';
 
 export async function verifyJWT(req, res, next) {
   try {

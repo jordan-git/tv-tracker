@@ -1,6 +1,5 @@
-import { verifyJWT } from './middleware.js';
-import { sendRequest, signToken } from './util.js';
 import dotenv from 'dotenv-safe';
+import { sendRequest, signToken } from './utils.js';
 
 dotenv.config();
 
@@ -97,7 +96,7 @@ export async function auth(req, res) {
 
   res.cookie('refresh-token', response.refresh, { httpOnly: true, sameSite: 'strict', secure: false });
 
-  const jwt = await signToken({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '2m' });
+  const jwt = await signToken({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '3m' });
 
   res.json({ jwt });
 }
