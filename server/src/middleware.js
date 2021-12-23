@@ -1,15 +1,17 @@
 import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
 import knex from './connection.js'
-
-const verifyToken = util.promisify(jsonwebtoken.verify);
+import { verifyToken } from './util.js';
 
 export async function verifyJWT(req, res, next) {
-  const [, token] = req.headers.authorization.split(' ');
   try {
-    const { id } = await verifyToken(token, process.env.JWT_SECRET);
+    const { jwt } = req.body;
 
-    const user = await knex('users').select("*").where({ id }).first();
+    const decoded = await verifyToken(jwt, process.env.JWT_SECRET);
+
+    req.user = decoded;
+
+    const user = await knex('users').select("*").where({ id: decoded.id }).first();
 
     if (!user) {
       res.status(401).json({ error: 'Invalid token' });
@@ -22,13 +24,15 @@ export async function verifyJWT(req, res, next) {
       case 'jwt expired':
         res.status(401).json({ error: 'Token expired' });
         break;
+      case 'token is not defined':
+        res.status(400).json({ error: 'Token missing' });
+        break;
       case 'jwt malformed':
       case 'invalid signature':
+      default:
+        console.error(err.message)
         res.status(401).json({ error: 'Invalid token' });
         break;
-      default:
-        res.status(500).json({ error: 'Internal server error' });
-        console.error(`Uncaught JWT error: ${err}`);
     }
   }
 }

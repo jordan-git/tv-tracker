@@ -3,28 +3,31 @@ import jsonwebtoken from 'jsonwebtoken';
 import util from 'util';
 
 import knex from './db.js'
+import { sendRequest, signToken } from '../../util.js';
 
-const signToken = util.promisify(jsonwebtoken.sign);
-
-export async function verifyCredentials(req, res) {
+export async function login(req, res) {
   const { email, password } = req.body;
 
+  // Check for email
   const user = await knex('users').select("*").where({ email }).first();
-
   if (!user) {
     res.status(401).json({ error: 'Invalid email/password combination' });
     return;
   }
 
+  // Check if passwords match
   const isValid = await bcrypt.compare(password, user.password);
-
   if (!isValid) {
     res.status(401).json({ error: 'Invalid email/password combination' });
   }
 
-  const token = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  // TODO: Make function for JWT signing
+  // Sign JWT token
+  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-  res.send({ token });
+  const { refresh } = await sendRequest(`/users/${user.id}/token`, 'POST');
+
+  res.send({ jwt, refresh });
 }
 
 export async function getUsers(req, res) {
@@ -117,4 +120,53 @@ export async function deleteUser(req, res) {
   await knex('users').where({ id }).del();
 
   res.json({ id });
-} 
+}
+
+// Middleware
+export async function getRefreshToken(req, res) {
+  const { id } = req.params;
+
+  const { token } = await knex('tokens').select("*").where({ user_id: id }).first();
+
+  if (!token) {
+    res.status(404).json({ error: 'Token not found' });
+    return;
+  }
+
+  res.json({ token: token });
+}
+
+function generateRefreshToken() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+
+  for (let i = 0; i < 32; i++) {
+    token += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  return token;
+}
+
+export async function createRefreshToken(req, res) {
+  const { id: user_id } = req.params;
+
+  // Create refresh token
+  const existingRefreshToken = await knex('tokens').select("*").where({ user_id }).first();
+
+  if (existingRefreshToken) {
+    await knex('tokens').where({ user_id }).del();
+  }
+
+  const refreshToken = generateRefreshToken();
+
+  const hourFromNow = new Date(new Date().getTime() + 1000 * 60 * 60);
+  const [expires] = hourFromNow.toISOString().split('T');
+
+  await knex('tokens').insert({
+    token: refreshToken,
+    expires,
+    user_id
+  });
+
+  return res.json({ refresh: refreshToken });
+}

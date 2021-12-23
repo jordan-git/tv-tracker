@@ -14,12 +14,15 @@
         "@phoenix35/express-async-methods": "^0.1.0",
         "bcrypt": "^5.0.1",
         "body-parser": "^1.19.1",
+        "cookie-parser": "^1.4.6",
         "express": "^4.17.1",
+        "express-winston": "^4.2.0",
         "http-proxy-middleware": "^2.0.1",
         "jsonwebtoken": "^8.5.1",
         "knex": "^0.95.14",
         "mysql2": "^2.3.3",
-        "node-fetch": "^3.1.0"
+        "node-fetch": "^3.1.0",
+        "winston": "^3.3.3"
     },
     "type": "module",
     "devDependencies": {

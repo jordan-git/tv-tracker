@@ -28,4 +28,15 @@ const encryptedUsers = await Promise.all(users.map(encryptPassword));
 
 await knex('users').insert(encryptedUsers);
 
+const tokenTableExists = await knex.schema.hasTable('tokens');
+
+if (!tokenTableExists) {
+  await knex.schema.createTable('tokens', (table) => {
+    table.increments('id').primary();
+    table.string('token').unique();
+    table.dateTime('expires').notNullable();
+    table.integer('user_id').unsigned().references('id').inTable('users');;
+  });
+}
+
 export default knex;
