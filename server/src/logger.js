@@ -5,18 +5,19 @@ import { logsFolderPath } from './utils.js';
 
 dotenv.config();
 
+// TODO: Make helper function to create logger for each service
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
     new winston.transports.File({ filename: path.join(logsFolderPath, 'error.log'), level: 'error' }),
-    new winston.transports.File({ filename: path.join(logsFolderPath, 'main.log') }),
-  ],
+    new winston.transports.File({ filename: path.join(logsFolderPath, 'main.log') })
+  ]
 });
 
 if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
+    format: winston.format.simple()
   }));
 }
 

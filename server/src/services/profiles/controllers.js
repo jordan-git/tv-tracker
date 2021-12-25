@@ -1,15 +1,15 @@
 import knex from './db.js';
-import { sendRequest } from '../../utils.js';
+import { sendJsonRequest } from '../../utils.js';
 
 // TODO: Add error handling
 
-export async function getProfiles(req, res) {
+export async function getProfiles (req, res) {
   const profiles = await knex('profiles').select('*');
 
   res.json(profiles);
 }
 
-export async function getProfile(req, res) {
+export async function getProfile (req, res) {
   const { id } = req.params;
 
   const profile = await knex('profiles').select('*').where({ id }).first();
@@ -22,10 +22,10 @@ export async function getProfile(req, res) {
   res.json(profile);
 }
 
-export async function createProfile(req, res) {
+export async function createProfile (req, res) {
   const { user_id } = req.body;
 
-  const user = await sendRequest(`/users/${user_id}`, 'GET');
+  const user = await sendJsonRequest(`/users/${user_id}`, 'GET');
 
   if (user.error) {
     res.status(400).json({ error: user.error });
@@ -44,7 +44,7 @@ export async function createProfile(req, res) {
   res.json({ id });
 }
 
-export async function updateProfile(req, res) {
+export async function updateProfile (req, res) {
   const { id } = req.params;
 
   const profile = await knex('profiles').select('*').where({ id }).first();
@@ -59,7 +59,7 @@ export async function updateProfile(req, res) {
   res.json({ id });
 }
 
-export async function deleteProfile(req, res) {
+export async function deleteProfile (req, res) {
   const { id } = req.params;
 
   const profile = await knex('profiles').select('*').where({ id }).first();

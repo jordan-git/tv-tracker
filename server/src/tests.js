@@ -1,41 +1,45 @@
 import dotenv from 'dotenv-safe';
 
-import { sendRequest } from './util';
+import { sendJsonRequest, sendRequest } from './utils.js';
 
 dotenv.config();
 
 // TODO: Add delete functionality for cleanup
+// TODO: Fix test that relies on cookie
 
-let token;
+let jwt;
 const endpoints = {
   login: '/login',
   register: '/register',
-  verify: '/verify',
-}
+  refresh: '/auth'
+};
 const dummyData = {
   username: Math.random().toString(36).slice(2),
   email: Math.random().toString(36).slice(2),
-  password: Math.random().toString(36).slice(2),
-}
+  password: Math.random().toString(36).slice(2)
+};
 
 describe('Main Service', () => {
   test('Can handle register', async () => {
-    const data = await sendRequest(endpoints.register, 'POST', dummyData);
+    const response = await sendRequest(endpoints.register, 'POST', dummyData);
+    const data = await response.json();
 
-    expect(data).toHaveProperty('token');
-    token = data.token;
+    console.log(response);
+
+    expect(data).toHaveProperty('jwt') && expect(response.cookies);
+    jwt = data.jwt;
   });
 
   test('Can handle login', async () => {
     const { email, password } = dummyData;
 
-    const data = await sendRequest(endpoints.login, 'POST', { email, password });
+    const data = await sendJsonRequest(endpoints.login, 'POST', { email, password });
 
-    expect(data).toHaveProperty('token');
+    expect(data).toHaveProperty('jwt');
   });
 
-  test('Can verify JWT', async () => {
-    const data = await sendRequest(endpoints.verify, 'GET', null, { Authorization: `Bearer ${token}` });
+  test('Can refresh token', async () => {
+    const data = await sendJsonRequest(endpoints.refresh, 'POST', { jwt });
 
     expect(data).toHaveProperty('verified') && expect(data.verified).toBe(true);
   });

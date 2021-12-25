@@ -1,12 +1,12 @@
 import bcrypt from 'bcrypt';
-import knex from './db.js'
-import { sendRequest, signToken } from '../../utils.js';
+import knex from './db.js';
+import { sendJsonRequest, signToken } from '../../utils.js';
 
-export async function login(req, res) {
+export async function login (req, res) {
   const { email, password } = req.body;
 
   // Check for email
-  const user = await knex('users').select("*").where({ email }).first();
+  const user = await knex('users').select('*').where({ email }).first();
   if (!user) {
     res.status(401).json({ error: 'Invalid email/password combination' });
     return;
@@ -22,20 +22,20 @@ export async function login(req, res) {
   // Sign JWT token
   const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '3m' });
 
-  const { refresh } = await sendRequest(`/users/${user.id}/token`, 'POST');
+  const { refresh } = await sendJsonRequest(`/users/${user.id}/token`, 'POST');
 
   res.send({ jwt, refresh });
 }
 
-export async function getUsers(req, res) {
-  const users = await knex('users').select("*");
+export async function getUsers (req, res) {
+  const users = await knex('users').select('*');
   res.json(users);
 }
 
-export async function getUser(req, res) {
+export async function getUser (req, res) {
   const { id } = req.params;
 
-  const user = await knex('users').select("*").where({ id }).first();
+  const user = await knex('users').select('*').where({ id }).first();
 
   if (!user) {
     res.status(404).json({ error: 'User not found' });
@@ -45,17 +45,17 @@ export async function getUser(req, res) {
   res.json(user);
 }
 
-export async function createUser(req, res) {
+export async function createUser (req, res) {
   const { username, email, password } = req.body;
 
-  const emailExists = await knex('users').select("*").where({ email }).first();
+  const emailExists = await knex('users').select('*').where({ email }).first();
 
   if (emailExists) {
     res.status(409).json({ error: 'Email already in use' });
     return;
   }
 
-  const usernameExists = await knex('users').select("*").where({ username }).first();
+  const usernameExists = await knex('users').select('*').where({ username }).first();
 
   if (usernameExists) {
     res.status(409).json({ error: 'Username already in use' });
@@ -69,25 +69,25 @@ export async function createUser(req, res) {
   res.json({ id });
 }
 
-export async function updateUser(req, res) {
+export async function updateUser (req, res) {
   const { id } = req.params;
   const { username, email, password } = req.body;
 
-  const user = await knex('users').select("*").where({ id }).first();
+  const user = await knex('users').select('*').where({ id }).first();
 
   if (!user) {
     res.status(400).json({ error: 'User not found' });
     return;
   }
 
-  const emailExists = await knex('users').select("*").where({ email }).first();
+  const emailExists = await knex('users').select('*').where({ email }).first();
 
   if (emailExists && email !== user.email) {
     res.status(409).json({ error: 'Email already in use' });
     return;
   }
 
-  const usernameExists = await knex('users').select("*").where({ username }).first();
+  const usernameExists = await knex('users').select('*').where({ username }).first();
 
   if (usernameExists && username !== user.username) {
     res.status(409).json({ error: 'Username already in use' });
@@ -101,10 +101,10 @@ export async function updateUser(req, res) {
   res.json({ id });
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser (req, res) {
   const { id } = req.params;
 
-  const user = await knex('users').select("*").where({ id }).first();
+  const user = await knex('users').select('*').where({ id }).first();
 
   if (!user) {
     res.status(404).json({ error: 'User not found' });
@@ -119,10 +119,10 @@ export async function deleteUser(req, res) {
 }
 
 // Middleware
-export async function getRefreshToken(req, res) {
+export async function getRefreshToken (req, res) {
   const { id } = req.params;
 
-  const { token } = await knex('tokens').select("*").where({ user_id: id }).first();
+  const { token } = await knex('tokens').select('*').where({ user_id: id }).first();
 
   if (!token) {
     res.status(404).json({ error: 'Token not found' });
@@ -132,7 +132,7 @@ export async function getRefreshToken(req, res) {
   res.json({ token: token });
 }
 
-function generateRefreshToken() {
+function generateRefreshToken () {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
 
@@ -143,11 +143,11 @@ function generateRefreshToken() {
   return token;
 }
 
-export async function createRefreshToken(req, res) {
+export async function createRefreshToken (req, res) {
   const { id: user_id } = req.params;
 
   // Create refresh token
-  const existingRefreshToken = await knex('tokens').select("*").where({ user_id }).first();
+  const existingRefreshToken = await knex('tokens').select('*').where({ user_id }).first();
 
   if (existingRefreshToken) {
     await knex('tokens').where({ user_id }).del();

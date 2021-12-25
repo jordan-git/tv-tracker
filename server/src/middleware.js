@@ -1,9 +1,7 @@
-import jsonwebtoken from 'jsonwebtoken';
-import util from 'util';
-import knex from './connection.js'
+import knex from './connection.js';
 import { verifyToken } from './utils.js';
 
-export async function verifyJWT(req, res, next) {
+export async function verifyJWT (req, res, next) {
   try {
     const { jwt } = req.body;
 
@@ -11,7 +9,7 @@ export async function verifyJWT(req, res, next) {
 
     req.user = decoded;
 
-    const user = await knex('users').select("*").where({ id: decoded.id }).first();
+    const user = await knex('users').select('*').where({ id: decoded.id }).first();
 
     if (!user) {
       res.status(401).json({ error: 'Invalid token' });
@@ -30,18 +28,18 @@ export async function verifyJWT(req, res, next) {
       case 'jwt malformed':
       case 'invalid signature':
       default:
-        console.error(err.message)
+        console.error(err.message);
         res.status(401).json({ error: 'Invalid token' });
         break;
     }
   }
 }
 
-export function createRequiredFieldsMiddleWare(fields) {
+export function createRequiredFieldsMiddleWare (fields) {
   return (req, res, next) => {
-    const missingFields = fields.reduce(((acc, field) =>
+    const missingFields = fields.reduce((acc, field) =>
       !Object.prototype.hasOwnProperty.call(req.body, field) ? [...acc, field] : acc
-    ), []);
+    , []);
 
     if (missingFields.length) {
       res.status(400).json({
@@ -52,5 +50,5 @@ export function createRequiredFieldsMiddleWare(fields) {
     }
 
     next();
-  }
+  };
 }

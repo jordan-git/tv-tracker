@@ -1,14 +1,14 @@
 import dotenv from 'dotenv-safe';
-import { sendRequest, signToken } from './utils.js';
+import { sendJsonRequest, signToken } from './utils.js';
 
 dotenv.config();
 
-// TODO: Move register/login controllers to user service & handle with sendRequest helper function
-export async function register(req, res) {
+// TODO: Move register/login controllers to user service & handle with sendJsonRequest helper function
+export async function register (req, res) {
   const { username, email, password, gender, birthday } = req.body;
 
   // Create user
-  const userData = await sendRequest('/users', 'POST', { username, email, password });
+  const userData = await sendJsonRequest('/users', 'POST', { username, email, password });
 
   if (userData.error) {
     let status;
@@ -25,13 +25,13 @@ export async function register(req, res) {
   }
 
   // Create profile
-  const profileData = await sendRequest('/profiles', 'POST', { gender, birthday, user_id: userData.id });
+  const profileData = await sendJsonRequest('/profiles', 'POST', { gender, birthday, user_id: userData.id });
 
   if (profileData.error) {
     let status;
     switch (profileData.error) {
       case 'User already has a profile':
-        status = 409
+        status = 409;
         break;
       default:
         status = 400;
@@ -41,18 +41,18 @@ export async function register(req, res) {
   }
 
   // Get JWT token
-  const loginData = await sendRequest('/users/login', 'POST', { email, password });
+  const loginData = await sendJsonRequest('/users/login', 'POST', { email, password });
 
   if (loginData.error) {
     let status;
     switch (loginData.error) {
       case 'Invalid email/password combination':
-        status = 401
+        status = 401;
         break;
       default:
         status = 400;
     }
-    res.status(400).json({ error: loginData.error });
+    res.status(status).json({ error: loginData.error });
     return;
   }
 
@@ -61,16 +61,16 @@ export async function register(req, res) {
   res.json({ jwt: loginData.jwt });
 }
 
-export async function login(req, res) {
+export async function login (req, res) {
   const { email, password } = req.body;
 
-  const { jwt, refresh, error } = await sendRequest('/users/login', 'POST', { email, password });
+  const { jwt, refresh, error } = await sendJsonRequest('/users/login', 'POST', { email, password });
 
   if (error) {
     let status;
     switch (error) {
       case 'Invalid email/password combination':
-        status = 401
+        status = 401;
         break;
       default:
         status = 400;
@@ -84,7 +84,7 @@ export async function login(req, res) {
   res.json({ jwt });
 }
 
-export async function auth(req, res) {
+export async function auth (req, res) {
   const refreshToken = req.cookies['refresh-token'];
 
   if (!refreshToken) {
@@ -92,7 +92,7 @@ export async function auth(req, res) {
     return;
   }
 
-  const response = await sendRequest(`/users/${req.user.id}/token`, 'GET');
+  const response = await sendJsonRequest(`/users/${req.user.id}/token`, 'GET');
 
   res.cookie('refresh-token', response.refresh, { httpOnly: true, sameSite: 'strict', secure: false });
 

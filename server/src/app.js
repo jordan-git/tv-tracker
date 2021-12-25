@@ -9,8 +9,6 @@ import { fileURLToPath } from 'url';
 import logger from './logger.js';
 import router from './routes.js';
 
-
-
 dotenv.config();
 
 // default commonJS variable created manually for ES
@@ -43,14 +41,14 @@ app.use('/api/users', createProxyMiddleware({
   target: `http://localhost:${process.env.USER_PORT}/`,
   pathRewrite: { '^/api/users': '' },
   onProxyReq: fixRequestBody,
-  timeout,
+  timeout
 }));
 
 app.use('/api/profiles', createProxyMiddleware({
   target: `http://localhost:${process.env.PROFILE_PORT}/`,
   pathRewrite: { '^/api/profiles': '' },
   onProxyReq: fixRequestBody,
-  timeout,
+  timeout
 }));
 
 app.use('/api', router);

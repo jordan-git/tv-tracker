@@ -10,10 +10,11 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const logsFolderPath = path.join(__dirname, '../logs');
 
-export async function sendRequest(endpoint, method, payload = null, headers = {}) {
+export async function sendRequest (endpoint, method, payload = null, headers = {}) {
   const options = {
     method,
     headers,
+    credentials: 'same-origin'
   };
 
   options.headers['Content-Type'] = 'application/json';
@@ -24,7 +25,11 @@ export async function sendRequest(endpoint, method, payload = null, headers = {}
 
   const url = `http://localhost:${process.env.SERVER_PORT}/api${endpoint}${method === 'GET' && payload ? `?${new URLSearchParams(payload)}` : ''}`;
 
-  const response = await fetch(url, options);
+  return fetch(url, options);
+}
+
+export async function sendJsonRequest (endpoint, method, payload = null, headers = {}) {
+  const response = await sendRequest(endpoint, method, payload, headers);
 
   return response.json();
 }
