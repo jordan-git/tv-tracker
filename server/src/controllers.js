@@ -4,7 +4,7 @@ import { sendJsonRequest, signToken } from './utils.js';
 dotenv.config();
 
 // TODO: Move register/login controllers to user service & handle with sendJsonRequest helper function
-export async function register (req, res) {
+export async function register(req, res) {
   const { username, email, password, gender, birthday } = req.body;
 
   // Create user
@@ -61,7 +61,7 @@ export async function register (req, res) {
   res.json({ jwt: loginData.jwt });
 }
 
-export async function login (req, res) {
+export async function login(req, res) {
   const { email, password } = req.body;
 
   const { jwt, refresh, error } = await sendJsonRequest('/users/login', 'POST', { email, password });
@@ -84,17 +84,24 @@ export async function login (req, res) {
   res.json({ jwt });
 }
 
-export async function auth (req, res) {
-  const refreshToken = req.cookies['refresh-token'];
+export async function auth(req, res) {
+  const userRefresh = req.cookies['refresh-token'];
 
-  if (!refreshToken) {
+  if (!userRefresh) {
     res.status(404).json({ error: 'No refresh token' });
     return;
   }
 
-  const response = await sendJsonRequest(`/users/${req.user.id}/token`, 'GET');
+  const { token: savedRefresh } = await sendJsonRequest(`/users/${req.user.id}/token`, 'GET');
 
-  res.cookie('refresh-token', response.refresh, { httpOnly: true, sameSite: 'strict', secure: false });
+  if (savedRefresh !== userRefresh) {
+    res.status(401).json({ error: 'Invalid refresh token' });
+    return;
+  }
+
+  const { refresh } = await sendJsonRequest(`/users/${req.user.id}/token`, 'POST');
+
+  res.cookie('refresh-token', refresh, { httpOnly: true, sameSite: 'strict', secure: false });
 
   const jwt = await signToken({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '3m' });
 
