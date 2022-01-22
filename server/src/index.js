@@ -1,9 +1,7 @@
-// import fsP from 'fs/promises';
 import dotenv from 'dotenv-safe';
 import path from 'path';
 import { pathToFileURL, fileURLToPath } from 'url';
 
-// load environment variables
 dotenv.config();
 
 import app from './app.js';

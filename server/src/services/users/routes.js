@@ -1,7 +1,7 @@
 import { Router } from '@phoenix35/express-async-methods';
 
-import { login, createUser, getUsers, getUser, updateUser, deleteUser, getRefreshToken, createRefreshToken, deleteRefreshToken } from './controllers.js';
-import { createRequiredFieldsMiddleWare } from '../../middleware.js';
+import { login, createUser, getUsers, getUser, updateUser, deleteUser, getRefreshToken, createRefreshToken, deleteRefreshToken, readJwt } from './controllers.js';
+import { createRequiredFieldsMiddleWare, verifyJWT } from '../../middleware.js';
 
 const router = Router();
 
@@ -22,5 +22,7 @@ router.getAsync('/:id/token', getRefreshToken);
 router.postAsync('/:id/token', createRefreshToken);
 
 router.deleteAsync('/:id/token', deleteRefreshToken);
+
+router.postAsync('/me', verifyJWT, readJwt);
 
 export default router;

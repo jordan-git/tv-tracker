@@ -3,7 +3,7 @@ import { verifyToken } from './utils.js';
 
 export async function verifyJWT (req, res, next) {
   try {
-    const { jwt } = req.body;
+    const jwt = req.headers.authorization.split(' ')[1];
 
     const decoded = await verifyToken(jwt, process.env.JWT_SECRET);
 

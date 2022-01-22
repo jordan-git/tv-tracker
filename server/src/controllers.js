@@ -1,10 +1,10 @@
 import dotenv from 'dotenv-safe';
-import { sendJsonRequest, signToken } from './utils.js';
+import { sendJsonRequest, signToken, decodeToken } from './utils.js';
 
 dotenv.config();
 
 // TODO: Move register/login controllers to user service & handle with sendJsonRequest helper function
-export async function register(req, res) {
+export async function register (req, res) {
   const { username, email, password, gender, birthday } = req.body;
 
   // Create user
@@ -43,6 +43,7 @@ export async function register(req, res) {
   // Get JWT token
   const loginData = await sendJsonRequest('/users/login', 'POST', { email, password });
 
+  // TODO: Write cleaner (try/catch json request helper)
   if (loginData.error) {
     let status;
     switch (loginData.error) {
@@ -56,12 +57,12 @@ export async function register(req, res) {
     return;
   }
 
-  res.cookie('refresh-token', loginData.refresh, { httpOnly: true, sameSite: 'strict', secure: false });
+  res.cookie('refresh-token', loginData.refresh, { httpOnly: false, secure: false });
 
   res.json({ jwt: loginData.jwt });
 }
 
-export async function login(req, res) {
+export async function login (req, res) {
   const { email, password } = req.body;
 
   const { jwt, refresh, error } = await sendJsonRequest('/users/login', 'POST', { email, password });
@@ -79,31 +80,34 @@ export async function login(req, res) {
     return;
   }
 
-  res.cookie('refresh-token', refresh, { httpOnly: true, sameSite: 'strict', secure: false });
+  res.cookie('refresh-token', refresh, { httpOnly: false, secure: false });
 
   res.json({ jwt });
 }
 
-export async function auth(req, res) {
+export async function refresh (req, res) {
   const userRefresh = req.cookies['refresh-token'];
 
   if (!userRefresh) {
-    res.status(404).json({ error: 'No refresh token' });
+    res.status(403).json({ error: 'No refresh token' });
     return;
   }
 
-  const { token: savedRefresh } = await sendJsonRequest(`/users/${req.user.id}/token`, 'GET');
+  const jwt = req.headers.authorization.split(' ')[1];
+  const { payload: { id }} = decodeToken(jwt, { complete: true });
+
+  const { token: savedRefresh } = await sendJsonRequest(`/users/${id}/token`, 'GET');
 
   if (savedRefresh !== userRefresh) {
-    res.status(401).json({ error: 'Invalid refresh token' });
+    res.status(403).json({ error: 'Invalid refresh token' });
     return;
   }
 
-  const { refresh } = await sendJsonRequest(`/users/${req.user.id}/token`, 'POST');
+  const { refresh } = await sendJsonRequest(`/users/${id}/token`, 'POST');
 
-  res.cookie('refresh-token', refresh, { httpOnly: true, sameSite: 'strict', secure: false });
+  res.cookie('refresh-token', refresh, { httpOnly: false, secure: false });
 
-  const jwt = await signToken({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '3m' });
+  const newJwt = await signToken({ id }, process.env.JWT_SECRET, { expiresIn: '5s' });
 
-  res.json({ jwt });
+  res.json({ jwt: newJwt });
 }

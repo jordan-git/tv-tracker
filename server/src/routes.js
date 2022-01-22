@@ -1,5 +1,5 @@
 import { Router } from '@phoenix35/express-async-methods';
-import { register, login, auth } from './controllers.js';
+import { register, login, refresh } from './controllers.js';
 import { createRequiredFieldsMiddleWare, verifyJWT } from './middleware.js';
 
 const router = Router();
@@ -8,10 +8,11 @@ router.postAsync('/register', createRequiredFieldsMiddleWare(['username', 'email
 
 router.postAsync('/login', createRequiredFieldsMiddleWare(['email', 'password']), login);
 
-router.getAsync('/verify', verifyJWT, (req, res) => {
-  res.json({ verified: true });
+// TODO Consider refreshing automatically in /auth
+router.getAsync('/auth', verifyJWT, (req, res) => {
+  res.json({ user: req.user });
 });
 
-router.postAsync('/auth', createRequiredFieldsMiddleWare(['jwt']), verifyJWT, auth);
+router.getAsync('/refresh', refresh);
 
 export default router;

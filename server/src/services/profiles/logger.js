@@ -20,7 +20,7 @@ const format = winston.format.combine(
   winston.format.timestamp({
     format: 'YYYY-MM-DD HH:mm:ss'
   }),
-  winston.format.printf((info) => `[Profile Service] ${info.timestamp} ${info.level}: ${info.message}`)
+  winston.format.printf(info => `[Profile Service] ${info.timestamp} ${info.level}: ${info.message}`)
 );
 
 const logger = expressWinston.logger({
@@ -28,7 +28,9 @@ const logger = expressWinston.logger({
   format,
   meta: false,
   expressFormat: true,
-  ignoreRoute: function (req, res) { return false; }
+  ignoreRoute (req, res) {
+    return false;
+  }
 });
 
 export default logger;

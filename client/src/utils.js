@@ -1,8 +1,11 @@
-export async function fetchApi(url, method = 'GET', body) {
+async function fetchApi (url, method = 'GET', { headers = {}, body = null } = {}) {
   const options = {
+    credentials: 'include',
     method,
     headers: {
+      'Accept': 'application/json',
       'Content-Type': 'application/json',
+      ...headers
     }
   };
 
@@ -11,7 +14,6 @@ export async function fetchApi(url, method = 'GET', body) {
   }
 
   const response = await fetch(url, options);
-
   const data = await response.json();
 
   if (data.error) {
@@ -20,3 +22,5 @@ export async function fetchApi(url, method = 'GET', body) {
 
   return data;
 }
+
+export { fetchApi };

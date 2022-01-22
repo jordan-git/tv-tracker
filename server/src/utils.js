@@ -10,14 +10,15 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const logsFolderPath = path.join(__dirname, '../logs');
 
+// TODO: Use error throwing to handle JSON errors
 export async function sendRequest (endpoint, method, payload = null, headers = {}) {
   const options = {
     method,
-    headers,
+    headers: {
+      'Content-Type': 'application/json'
+    },
     credentials: 'same-origin'
   };
-
-  options.headers['Content-Type'] = 'application/json';
 
   if (payload && method !== 'GET') {
     options.body = JSON.stringify(payload);
@@ -36,3 +37,4 @@ export async function sendJsonRequest (endpoint, method, payload = null, headers
 
 export const signToken = util.promisify(jsonwebtoken.sign);
 export const verifyToken = util.promisify(jsonwebtoken.verify);
+export const decodeToken = jsonwebtoken.decode;

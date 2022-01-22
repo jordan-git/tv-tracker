@@ -1,15 +1,6 @@
-import React from "react";
-import {
-  Navigate
-} from "react-router-dom";
-import {
-  UserContext,
-} from '../App.js'
+import { Navigate } from 'react-router-dom';
 
-export default function Logout() {
-  const { setJwt } = React.useContext(UserContext);
-
+export function Logout({ setJwt }) {
   setJwt(null);
-
-  return <Navigate to="/" />;
+  return <Navigate to='/' />;
 }

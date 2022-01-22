@@ -14,8 +14,8 @@ if (!userTableExists) {
 }
 
 const users = [
-  { username: 'John Doe', email: 'test1@mail.com', password: 'password' },
-  { username: 'Jane Doe', email: 'test2@mail.com', password: 'password' }
+  { username: 'John Doe', email: 'test1@mail.com', password: 'Password1' },
+  { username: '1', email: '1', password: '1' }
 ];
 
 async function encryptPassword(user) {

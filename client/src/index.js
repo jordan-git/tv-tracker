@@ -1,5 +1,12 @@
-import { render } from "react-dom";
-import App from "./App";
-import './index.css';
+import { ColorModeScript } from '@chakra-ui/react';
+import React, { StrictMode } from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
 
-render(<App />, document.body);
+ReactDOM.render(
+  <StrictMode>
+    <ColorModeScript />
+    <App />
+  </StrictMode>,
+  document.getElementById('root')
+);

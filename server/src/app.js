@@ -1,5 +1,6 @@
 import { addAsync } from '@phoenix35/express-async-methods';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv-safe';
 import express from 'express';
 import expressWinston from 'express-winston';
@@ -14,10 +15,13 @@ dotenv.config();
 // default commonJS variable created manually for ES
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// TODO: Set up logging for app to ease debugging
 // TODO: Set up linting for code quality
 const app = addAsync(express());
 
+app.use(cors({ 
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(join(__dirname, 'public')));
@@ -33,6 +37,7 @@ app.use((err, req, res, next) => {
   if (err instanceof SyntaxError) {
     res.status(400).send({ error: 'Bad Request' });
   }
+  next();
 });
 
 const timeout = 10000;
@@ -52,5 +57,9 @@ app.use('/api/profiles', createProxyMiddleware({
 }));
 
 app.use('/api', router);
+
+app.use('/', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'index.html'));
+});
 
 export default app;
