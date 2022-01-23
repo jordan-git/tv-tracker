@@ -21,7 +21,10 @@ export function Header({ jwt }) {
             <Link as={RouterLink} to='/login'>Login</Link>
             <Link as={RouterLink} to='/register'>Register</Link>
           </>
-        ) : <Link as={RouterLink} to='/logout'>Logout</Link>}
+        ) : <>
+          <Link as={RouterLink} to='/profiles/me'>Profile</Link>
+          <Link as={RouterLink} to='/logout'>Logout</Link>
+        </>}
       </Flex>
     </GridItem>
   );

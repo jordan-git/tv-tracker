@@ -10,9 +10,11 @@ import { About } from './components/About';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { Home } from './components/Home';
+import { Loading } from './components/Loading';
 import { Login } from './components/Login';
 import { Logout } from './components/Logout';
 import { NotFound } from './components/NotFound';
+import { Profile } from './components/Profile';
 import { Register } from './components/Register';
 import theme from './theme';
 import { fetchApi } from './utils';
@@ -41,7 +43,6 @@ const ProtectedRoute = ({ jwt, setJwt }) => {
         } catch (refreshErr) {
           localStorage.removeItem('jwt');
           setJwt(null);
-          setIsAuthenticated(false);
         } 
       }
     }
@@ -50,10 +51,10 @@ const ProtectedRoute = ({ jwt, setJwt }) => {
   }, []);
 
   // TODO: Show loading
-  return jwt ? (isAuthenticated ? <Outlet /> : null) : <Navigate to='/login' replace state={{ from: location }} />
+  return jwt ? (isAuthenticated ? <Outlet /> : <Loading />) : <Navigate to='/login' replace state={{ from: location }} />
 };
 
-const UnprotectedRoute = ({ jwt }) => !jwt ? <Outlet /> : <Navigate to='/' />;
+const UnprotectedRoute = ({ jwt }) => !jwt ? <Outlet /> : <Navigate to='/' replace />;
 
 function App() {
   const [jwt, setJwt] = React.useState(localStorage.getItem('jwt'));
@@ -65,14 +66,19 @@ function App() {
           <Header jwt={jwt} />
           <GridItem as={Routes}>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<ProtectedRoute jwt={jwt} setJwt={setJwt} />} >
-              <Route path="/about" element={<About />} />
+            <Route path="about" element={<ProtectedRoute jwt={jwt} setJwt={setJwt} />} >
+              <Route path="" element={<About />} />
             </Route>
-            <Route path="/register" element={<UnprotectedRoute jwt={jwt} />} >
-              <Route path="/register" element={<Register />} />
+            <Route path="register" element={<UnprotectedRoute jwt={jwt} />} >
+              <Route path="" element={<Register />} />
+            </Route>
+            <Route path="profiles" element={<ProtectedRoute jwt={jwt} setJwt={setJwt} />} >
+              <Route path="me" element={<Profile jwt={jwt} />} />
+              <Route path=":userId" element={<Profile jwt={jwt} />} />
             </Route>
             <Route path="/login" element={<Login setJwt={setJwt} />} />
             <Route path="/logout" element={<Logout setJwt={setJwt}/>} />
+            <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </GridItem>
           <Footer />

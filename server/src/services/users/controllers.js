@@ -20,7 +20,7 @@ export async function login (req, res) {
 
   // TODO: Make function for JWT signing
   // Sign JWT token
-  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '5s' });
+  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '5m' });
 
   const { refresh } = await sendJsonRequest(`/users/${user.id}/token`, 'POST');
 
@@ -185,4 +185,17 @@ export async function deleteRefreshToken (req, res) {
 
 export async function readJwt (req, res) {
   res.json({ user: req.user });
+}
+
+export async function getProfile(req, res) {
+  const { id } = req.params;
+
+  const profile = await knex('profiles').select('*').where({ user_id: id }).first();
+
+  if (!profile) {
+    res.status(404).json({ error: 'Profile not found' });
+    return;
+  }
+
+  res.json(profile);
 }

@@ -1,5 +1,5 @@
 import { Router } from '@phoenix35/express-async-methods';
-import { register, login, refresh } from './controllers.js';
+import { register, login, refresh, profile } from './controllers.js';
 import { createRequiredFieldsMiddleWare, verifyJWT } from './middleware.js';
 
 const router = Router();
@@ -14,5 +14,7 @@ router.getAsync('/auth', verifyJWT, (req, res) => {
 });
 
 router.getAsync('/refresh', refresh);
+
+router.getAsync('/profile', verifyJWT, profile);
 
 export default router;
