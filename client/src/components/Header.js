@@ -1,4 +1,4 @@
-import { Flex, GridItem, Link, Spacer, Text } from "@chakra-ui/react";
+import { Button, Flex, GridItem, Link, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { ColorModeSwitcher } from "../ColorModeSwitcher";
 
@@ -22,8 +22,23 @@ export function Header({ jwt }) {
             <Link as={RouterLink} to='/register'>Register</Link>
           </>
         ) : <>
-          <Link as={RouterLink} to='/profiles/me'>Profile</Link>
-          <Link as={RouterLink} to='/logout'>Logout</Link>
+          <Menu>
+            <MenuButton as={Text} colorScheme='pink'>
+              Profile
+            </MenuButton>
+            <MenuList>
+              <MenuGroup title='Profile'>
+                <MenuItem as={RouterLink} to='/profiles/me'>My Profile</MenuItem>
+                <MenuItem as={RouterLink} to='/settings'>Settings</MenuItem>
+              </MenuGroup>
+              <MenuDivider />
+              <MenuGroup title='Help'>
+                <MenuItem>Docs</MenuItem>
+                <MenuItem>FAQ</MenuItem>
+              </MenuGroup>
+            </MenuList>
+          </Menu>
+          <Link as={RouterLink} to='/logout'>Log Out</Link>
         </>}
       </Flex>
     </GridItem>

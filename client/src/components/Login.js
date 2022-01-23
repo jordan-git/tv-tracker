@@ -1,4 +1,4 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, InputGroup, InputRightElement, List, ListItem, Text, useColorModeValue, VStack } from "@chakra-ui/react";
+import { Button, Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, InputGroup, InputRightElement, List, ListItem, Text, useColorModeValue, VStack } from "@chakra-ui/react";
 import { ErrorMessage } from '@hookform/error-message';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
@@ -20,7 +20,7 @@ const schema = yup.object().shape({
     .test("length", "Password must at least 8 characters long", (v) => v.length >= 8)
 });
 
-export function Login({ setJwt }) {
+export function Login({ logIn }) {
   const navigate = useNavigate();
   const { state } = useLocation();
 
@@ -40,9 +40,10 @@ export function Login({ setJwt }) {
   const handleShowClick = () => setShowPassword(!showPassword);
 
   const onSubmit = async (data) => {
+    console.log(data)
     try {
       const { jwt } = await fetchApi('/api/login', 'POST', { body: data });
-      setJwt(jwt);
+      logIn(jwt);
       navigate(state?.from?.pathname ?? '/');
     } catch (err) {
       setError(err);
@@ -50,45 +51,51 @@ export function Login({ setJwt }) {
   };
 
   return (
-    <VStack as='form' onSubmit={handleSubmit(onSubmit)} p={2} maxW='400px'>
-      {error && <Text color='red.500'>{error}</Text>}
-      <FormControl isRequired isInvalid={errors.email}>
-        <FormLabel htmlFor='email'>Email</FormLabel>
-        <Input
-          id='email'
-          type='text'
-          placeholder='johndoe@tvtracker.ie'
-          {...register('email')}
-          borderColor={useColorModeValue('gray.400', 'gray.600')}
-        />
-        <ErrorMessage
-          errors={errors}
-          name='email'
-          render={({ messages }) => Object.values(messages).map((message, index) => <FormErrorMessage key={index} mt={1}>{message}</FormErrorMessage>)}
-        />
-      </FormControl>
-
-      <FormControl isRequired isInvalid={errors.password}>
-        <FormLabel htmlFor='password'>Password</FormLabel>
-        <InputGroup>
+    <Flex minH='100%' justifyContent='center' alignItems='center' flexDirection='column'>
+      <Heading>Log In</Heading>
+      <VStack as='form' onSubmit={handleSubmit(onSubmit)} p={2} display='inline-block'>
+        {error && <Text color='red.500'>{error}</Text>}
+        <FormControl isRequired isInvalid={errors.email}>
+          <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
-            id='password'
-            type={showPassword ? 'text' : 'password'}
-            placeholder='********'
-            {...register('password')}
+            id='email'
+            type='text'
+            placeholder='johndoe@tvtracker.ie'
+            {...register('email')}
             borderColor={useColorModeValue('gray.400', 'gray.600')}
           />
-          <InputRightElement>
-            <Button h={7} mr={4} px={1} onClick={handleShowClick}>{showPassword ? 'Show' : 'Hide'}</Button>
-          </InputRightElement>
-        </InputGroup>
-        <ErrorMessage
-          errors={errors}
-          name='password'
-          render={({ messages }) => <List>{Object.values(messages).map((message, index) => <FormErrorMessage key={index} as={ListItem} mt={0}>{message}</FormErrorMessage>)}</List>}
-        />
-      </FormControl>
-      <Button mt={4} isLoading={isSubmitting} type='submit'>Log In</Button>
-    </VStack>
+          <ErrorMessage
+            errors={errors}
+            name='email'
+            render={({ messages }) => Object.values(messages).map((message, index) => <FormErrorMessage key={index} mt={1}>{message}</FormErrorMessage>)}
+          />
+        </FormControl>
+
+        <FormControl isRequired isInvalid={errors.password}>
+          <FormLabel htmlFor='password'>Password</FormLabel>
+          <InputGroup>
+            <Input
+              id='password'
+              type={showPassword ? 'text' : 'password'}
+              placeholder='********'
+              {...register('password')}
+              borderColor={useColorModeValue('gray.400', 'gray.600')}
+            />
+            <InputRightElement>
+              <Button h={7} mr={4} px={1} onClick={handleShowClick}>{showPassword ? 'Show' : 'Hide'}</Button>
+            </InputRightElement>
+          </InputGroup>
+          <ErrorMessage
+            errors={errors}
+            name='password'
+            render={({ messages }) => <List>{Object.values(messages).map((message, index) => <FormErrorMessage key={index} as={ListItem} mt={0}>{message}</FormErrorMessage>)}</List>}
+          />
+        </FormControl>
+        <FormControl>
+          <Checkbox {...register('remember')} defaultChecked>Remember me</Checkbox>
+        </FormControl>
+        <Button mt={4} isLoading={isSubmitting} type='submit'>Log In</Button>
+      </VStack>
+    </Flex>
   );
 }

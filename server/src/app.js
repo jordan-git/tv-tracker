@@ -25,6 +25,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(join(__dirname, 'public')));
+app.use('/images',express.static(join(__dirname, '../images')));
 
 app.use(expressWinston.logger({
   winstonInstance: logger,

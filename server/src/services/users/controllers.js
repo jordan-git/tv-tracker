@@ -3,7 +3,7 @@ import knex from './db.js';
 import { sendJsonRequest, signToken } from '../../utils.js';
 
 export async function login (req, res) {
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
 
   // Check for email
   const user = await knex('users').select('*').where({ email }).first();
@@ -20,11 +20,11 @@ export async function login (req, res) {
 
   // TODO: Make function for JWT signing
   // Sign JWT token
-  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+  const jwt = await signToken({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '5s' });
 
   const { refresh } = await sendJsonRequest(`/users/${user.id}/token`, 'POST');
 
-  res.send({ jwt, refresh });
+  res.json({ jwt, refresh });
 }
 
 // TODO: Use API for database communication

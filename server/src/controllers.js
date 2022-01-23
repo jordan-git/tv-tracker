@@ -4,7 +4,7 @@ import { sendJsonRequest, signToken, decodeToken } from './utils.js';
 dotenv.config();
 
 // TODO: Move register/login controllers to user service & handle with sendJsonRequest helper function
-export async function register (req, res) {
+export async function register(req, res) {
   const { username, email, password, gender, birthday } = req.body;
 
   // Create user
@@ -62,10 +62,10 @@ export async function register (req, res) {
   res.json({ jwt: loginData.jwt });
 }
 
-export async function login (req, res) {
-  const { email, password } = req.body;
+export async function login(req, res) {
+  const { email, password, remember } = req.body;
 
-  const { jwt, refresh, error } = await sendJsonRequest('/users/login', 'POST', { email, password });
+  const { jwt, refresh, error } = await sendJsonRequest('/users/login', 'POST', { email, password, remember });
 
   if (error) {
     let status;
@@ -80,13 +80,15 @@ export async function login (req, res) {
     return;
   }
 
-  // TODO: Fix cookie properties https://github.com/jordan-git/tv-tracker/commit/4ea1307adbf5f32d3446258261b6e3b1fdeee70a#diff-4fbbf3f0c9b4ab9ae8628c10d748a746e7f3303a7d3c1c5fb6da13ca1a5fdd16L82
-  res.cookie('refresh-token', refresh, { httpOnly: false, secure: false });
+  if (remember) {
+    // TODO: Fix cookie properties https://github.com/jordan-git/tv-tracker/commit/4ea1307adbf5f32d3446258261b6e3b1fdeee70a#diff-4fbbf3f0c9b4ab9ae8628c10d748a746e7f3303a7d3c1c5fb6da13ca1a5fdd16L82
+    res.cookie('refresh-token', refresh, { httpOnly: true, secure: false });
+  }
 
   res.json({ jwt });
 }
 
-export async function refresh (req, res) {
+export async function refresh(req, res) {
   const userRefresh = req.cookies['refresh-token'];
 
   if (!userRefresh) {
@@ -95,7 +97,7 @@ export async function refresh (req, res) {
   }
 
   const jwt = req.headers.authorization.split(' ')[1];
-  const { payload: { id }} = decodeToken(jwt, { complete: true });
+  const { payload: { id } } = decodeToken(jwt, { complete: true });
 
   const { token: savedRefresh } = await sendJsonRequest(`/users/${id}/token`, 'GET');
 
@@ -123,5 +125,9 @@ export async function profile(req, res) {
     return;
   }
 
-  res.json({ profile });
+  const { username } = await sendJsonRequest(`/users/${id}`, 'GET');
+
+  const { id: _, user_id, ...rest } = profile;
+
+  res.json({ ...rest, username });
 }

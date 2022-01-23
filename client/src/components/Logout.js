@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 
-export function Logout({ setJwt }) {
-  setJwt(null);
+export function Logout({ logOut }) {
+  logOut();
   return <Navigate to='/' />;
 }
